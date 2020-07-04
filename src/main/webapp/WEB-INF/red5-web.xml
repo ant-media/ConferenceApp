@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.3.xsd 
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.3.xsd
+	http://www.springframework.org/schema/aop 
+    http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+
+	<context:annotation-config />
+	<!-- Defines a properties file for dereferencing variables -->
+	<context:property-placeholder location="/WEB-INF/red5-web.properties"/>
+	
+	<bean id="conferenceSettings" class="io.antmedia.conferenceapp.settings.ConferenceSettings" />
+	
+	<bean id="conferenceSettingsManager" class="io.antmedia.conferenceapp.settings.ConferenceSettingsManager">
+		<property name="settings" ref="conferenceSettings" />
+	</bean>
+	
+
+	<!-- Defines the web context -->
+	<bean id="web.context" class="org.red5.server.Context" autowire="byType" />
+
+	<!-- Defines the web scopes -->
+	<bean id="web.scope" class="org.red5.server.scope.WebScope">
+		<property name="server" ref="red5.server" />
+		<property name="parent" ref="global.scope" />
+		<property name="context" ref="web.context" />
+		<property name="handler" ref="web.handler" />
+	</bean>
+
+	<bean id="datastore" class="io.antmedia.conferenceapp.datastore.ConferenceStore">
+		<constructor-arg value="${webapp.dbName}" />
+	</bean>
+	<context:component-scan base-package="io.antmedia.conferenceapp.rest" />
+    
+	<!-- Defines the web handler which acts as an applications endpoint -->
+	<bean id="web.handler" class="io.antmedia.conferenceapp.ConferenceApplication">
+	</bean>
+</beans>
